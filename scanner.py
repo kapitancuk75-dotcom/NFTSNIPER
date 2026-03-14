@@ -1,9 +1,9 @@
 import asyncio
 
-from market_scanner import get_new_nfts
+from tonapi_scanner import get_new_nfts
+from floor_checker import get_floor_price
 from ai_engine import analyze_nft
 from telegram_sender import send_message
-from config import MAX_PRICE
 
 seen = set()
 
@@ -28,7 +28,7 @@ async def scan():
 
             metadata = nft.get("metadata", {})
 
-            name = metadata.get("name", "Unknown NFT")
+            name = metadata.get("name","Unknown NFT")
 
             sale = nft.get("sale")
 
@@ -42,10 +42,9 @@ async def scan():
 
             price = float(price) / 1e9
 
-            if price > MAX_PRICE:
-                continue
+            collection = nft.get("collection", {}).get("address")
 
-            floor = price * 1.5
+            floor = get_floor_price(collection)
 
             decision = analyze_nft(name, price, floor)
 
@@ -54,13 +53,16 @@ async def scan():
                 link = f"https://getgems.io/nft/{address}"
 
                 message = f"""
-🚨 NFT SNIPER AI SIGNAL
+🚨 NFT SNIPER AI 12.0 SIGNAL
 
 NFT:
 {name}
 
 Цена:
 {price} TON
+
+Floor:
+{floor} TON
 
 AI сигнал:
 {decision}
@@ -76,9 +78,9 @@ AI сигнал:
 
 async def main():
 
-    print("NFT SNIPER AI 10.0 STARTED")
+    print("NFT SNIPER AI 12.0 STARTED")
 
-    send_message("🤖 NFT SNIPER AI 10.0 запущен")
+    send_message("🤖 NFT SNIPER AI 12.0 запущен")
 
     await scan()
 
