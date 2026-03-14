@@ -12,48 +12,54 @@ async def scan():
 
     while True:
 
-        nfts = get_new_nfts()
+        try:
 
-        for nft in nfts:
+            nfts = get_new_nfts()
 
-            address = nft.get("address")
-
-            if not address:
+            if not nfts:
+                await asyncio.sleep(5)
                 continue
 
-            if address in seen:
-                continue
+            for nft in nfts:
 
-            seen.add(address)
+                address = nft.get("address")
 
-            metadata = nft.get("metadata", {})
+                if not address:
+                    continue
 
-            name = metadata.get("name","Unknown NFT")
+                if address in seen:
+                    continue
 
-            sale = nft.get("sale")
+                seen.add(address)
 
-            if not sale:
-                continue
+                metadata = nft.get("metadata", {})
 
-            price = sale.get("price", {}).get("value")
+                name = metadata.get("name","Unknown NFT")
 
-            if not price:
-                continue
+                sale = nft.get("sale")
 
-            price = float(price) / 1e9
+                if not sale:
+                    continue
 
-            collection = nft.get("collection", {}).get("address")
+                price = sale.get("price", {}).get("value")
 
-            floor = get_floor_price(collection)
+                if not price:
+                    continue
 
-            decision = analyze_nft(name, price, floor)
+                price = float(price) / 1e9
 
-            if decision in ["BUY","STRONG BUY"]:
+                collection = nft.get("collection", {}).get("address")
 
-                link = f"https://getgems.io/nft/{address}"
+                floor = get_floor_price(collection)
 
-                message = f"""
-🚨 NFT SNIPER AI 12.0 SIGNAL
+                decision = analyze_nft(name, price, floor)
+
+                if decision in ["BUY","STRONG BUY"]:
+
+                    link = f"https://getgems.io/nft/{address}"
+
+                    message = f"""
+🚨 NFT SNIPER AI SIGNAL
 
 NFT:
 {name}
@@ -71,7 +77,11 @@ AI сигнал:
 {link}
 """
 
-                send_message(message)
+                    send_message(message)
+
+        except Exception as e:
+
+            print("Scanner error:", e)
 
         await asyncio.sleep(5)
 
