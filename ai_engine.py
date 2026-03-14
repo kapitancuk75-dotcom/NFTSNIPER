@@ -5,15 +5,17 @@ def analyze_nft(name, price, floor):
 
     score = 0
 
-    # дешёвый NFT
-    if price < floor * 0.5:
-        score += 4
+    # недооценка
+    if price < floor * 0.4:
+        score += 5
 
-    elif price < floor * 0.7:
-        score += 2
+    elif price < floor * 0.6:
+        score += 3
 
-    # редкие слова
-    rare = [
+    elif price < floor * 0.8:
+        score += 1
+
+    rare_words = [
         "Diamond",
         "Gold",
         "Legendary",
@@ -21,18 +23,17 @@ def analyze_nft(name, price, floor):
         "Rare"
     ]
 
-    for r in rare:
+    for word in rare_words:
 
-        if r.lower() in name.lower():
+        if word.lower() in name.lower():
             score += 2
 
-    # случайный фактор рынка
     score += random.randint(0,2)
 
-    if score >= 6:
+    if score >= 7:
         return "STRONG BUY"
 
-    if score >= 4:
+    if score >= 5:
         return "BUY"
 
     if score >= 3:
